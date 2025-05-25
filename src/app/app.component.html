@@ -1,0 +1,121 @@
+<h1>MAP!</h1>
+
+<form [formGroup]="formGroup" autocomplete="off">
+  <div class="radio">
+    <label>
+      <input type="radio" name="actionType" value="Draw" formControlName="actionType" (change)="onActionChange()" />
+      Draw
+    </label>
+    <label>
+      <input type="radio" name="actionType" value="Modify" formControlName="actionType" (change)="onActionChange()" />
+      Modify
+    </label>
+  </div>
+
+  <span>
+    <select name="drawType" formControlName="drawType" (change)="onActionChange()">
+      <option value="Point">Point</option>
+      <option value="LineString">LineString</option>
+      <option value="Polygon">Polygon</option>
+      <option value="Circle">Circle</option>
+    </select>
+    <button>Graticule</button>
+    <input type="checkbox" (change)='getlayers($event)'>
+  </span>
+</form>
+  
+<span><button (click)="swapTool()">Swap!</button></span>
+
+<div id="treeview" style="position: absolute;
+background-color: rgb(242, 237, 237);
+height: 119px;
+width: 166px;
+top: 204px;
+bottom: 40px;
+border-radius: 7px;
+ z-index: 1; border: 2px solid black;">
+  <span>
+    Treeview
+  </span>
+  <div style="position: relative;">
+    <ul style="list-style: none; padding: 0; margin: 0;">
+      <li *ngFor="let layer of wmsLayers" style="position: relative;">
+        <input type="checkbox" [value]="layer" (contextmenu)="getlayerOpacity($event, layer)"
+          (change)="getlayer($event, layer)">
+        {{ layer.getSource()?.getParams().LAYERS }}
+
+
+
+
+
+
+      </li>
+    </ul>
+
+  </div>
+
+</div>
+
+<button (click)="handleTextAction()">{{ editableFeature ? 'Update Text' : 'Add Text' }}</button>
+<div *ngIf="textbox" style="position: absolute; height: 20vh; width: 12vw; top: 120px;left: 108px;">
+  <input type="text" [(ngModel)]="textnew">
+</div>
+
+<div *ngIf="contextMenuVisible" class="context-menu" style="background-color: gray;
+                  height: 34vh;
+                  width: 19vw;
+                  position: absolute;
+                  top: 203px;
+                  left: 179px;
+                  border-radius: 10px;
+                  z-index: 10px;"
+  [ngStyle]="{ top: contextMenuPosition.y + 'px', left: contextMenuPosition.x + 'px', position: 'absolute' }"
+  (click)="$event.stopPropagation()">
+  <label>Opacity: {{ selectedLayerOpacity | number:'1.0-2' }}</label>
+  <input type="range" min="0" max="1" step="0.01" [(ngModel)]="selectedLayerOpacity" (input)="updateOpacity()">
+
+  <div>
+    <input type="color" [(ngModel)]="strokeColor" (input)="updateLayerStyle()" />
+
+
+    <input type="range" min="1" max="10" [(ngModel)]="strokeWidth" (input)="updateLayerStyle()" />
+
+
+    <input type="color" [(ngModel)]="fillColor" (input)="updateLayerStyle()" />
+  </div>
+</div>
+
+<span  title="Base Maps" style="position: fixed; bottom: 60px; right: 40px; z-index: 20; cursor: pointer;" class="material-symbols-outlined "(click)="selectMap()">
+map
+</span>
+
+<div *ngIf="baseMapDiv" class="w-10  border border-secondary rounded position-absolute" style="height: 12%; bottom: 8%; z-index: 10;  background-color: rgba(189, 193, 198, 0.4); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    right: 7%;" >
+  <div class="row align-items-center " style="height: 12%; justify-content: center; gap: -50px; ">
+    <div class="col" style="padding: 6px 20px;"  >
+      <div>
+     <img src="./osm.PNG" alt="osm" class="basemap-icon"  title="OpenStreetMap" (click)="currentBasemap($event)" />
+    </div>
+      
+    </div>
+    <div class="col" style="padding: 6px 20px;">
+      <div>
+    
+     <img src="./Topo.PNG" alt="topo" class="basemap-icon" title="TopoMap" (click)="currentBasemap($event)"  />
+    </div>
+    </div>
+    <div class="col" style="padding: 6px 20px;">
+       <div>
+     <img src="./None.PNG" alt="None" class="basemap-icon" title="No Map"  (click)="currentBasemap($event)"/>
+    </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="map" style="position: relative;"> </div>
+ 
+
+<span *ngIf="swap">
+  <input #swipeRef type="range" style="width: 100%" [(ngModel)]="swipe1" (change)="onchangesBar($event)" >
+</span>
